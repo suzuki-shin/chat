@@ -1,111 +1,166 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta property="og:title" content="Milkcocoaで作ったリアルタイムチャット" />
+    <meta property="og:title" content="もくもくチャット " />
     <meta property="og:type" content="chat" />
     <meta property="og:description" content="BaaS（Milkcocoa）で作られたリアルタイムチャット" />
-    <title>Milkcocoaで作ったリアルタイムチャット</title>
+    <title>もくもくチャット</title>
     <link rel="stylesheet" href="style.css" type="text/css" />
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://cdn.mlkcca.com/v2.0.0/milkcocoa.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.mlkcca.com/v2.0.0/milkcocoa.js"></script>
+    <script src="https://cdn.auth0.com/js/lock-6.js"></script>
     <script>
-    $(function() {
-        //1.ミルクココアインスタンスを作成
-        var milkcocoa = new MilkCocoa("{your-app-id}.mlkcca.com");
+     $(function() {
+       //1.ミルクココアインスタンスを作成
+       var milkcocoa = new MilkCocoa("posti9vzof6b.mlkcca.com");
 
-        //2."message"データストアを作成
-        var ds = milkcocoa.dataStore("message");
+       //2."message"データストアを作成
+       var ds = milkcocoa.dataStore("meguro_mokumoku");
 
-        //3."message"データストアからメッセージを取ってくる
-        ds.stream().sort("desc").next(function(err, datas) {
-            datas.forEach(function(data) {
-                renderMessage(data.value);
-            });
-        });
+       //3."message"データストアからメッセージを取ってくる
+       ds.stream().sort("desc").next(function(err, datas) {
+         datas.forEach(function(data) {
+           renderMessage(data.value);
+         });
+       });
 
-        //4."message"データストアのプッシュイベントを監視
-        ds.on("push", function(e) {
-            renderMessage(e.value);
-        });
+       //4."message"データストアのプッシュイベントを監視
+       ds.on("push", function(e) {
+         renderMessage(e.value);
+       });
 
-        var last_message = "dummy";
+       var last_message = "dummy";
+       var username;
+       var picture;
 
-        function renderMessage(message) {
-            var message_html = '<p class="post-text">' + escapeHTML(message.content) + '</p>';
-            var date_html = '';
-            if(message.date) {
-                date_html = '<p class="post-date">'+escapeHTML( new Date(message.date).toLocaleString())+'</p>';
-            }
-            $("#"+last_message).before('<div id="'+message.id+'" class="post">'+message_html + date_html +'</div>');
-            last_message = message.id;
-        }
+       function renderMessage(message) {
+         var message_html = '<p class="post-text">' + escapeHTML(message.content) + '</p>';
+         var date_html = '';
+         var username_html = '';
+         var picture_html = '';
+         if(message.date) {
+           date_html = '<p class="post-date">'+escapeHTML( new Date(message.date).toLocaleString())+'</p>';
+         }
+         if(message.username) {
+           username_html = '<p class="post-username">@'+escapeHTML(message.username)+'</p>';
+         }
+         if(message.picture) {
+           picture_html = '<img class="post-username" src="' + escapeHTML(message.picture)+ '"/>';
+         }
+         $("#"+last_message).before('<div id="'+message.id+'" class="post">'+ picture_html + username_html + message_html + date_html + '</div>');
+         last_message = message.id;
+       }
 
-        function post() {
-            //5."message"データストアにメッセージをプッシュする
-            var content = escapeHTML($("#content").val());
-            if (content && content !== "") {
-                ds.push({
-                    title: "タイトル",
-                    content: content,
-                    date: new Date().getTime()
-                }, function (e) {});
-            }
-            $("#content").val("");
-        }
+       function post() {
+         //5."message"データストアにメッセージをプッシュする
+         var content = escapeHTML($("#content").val());
+         if (content && content !== "") {
+           ds.push({
+             title: "タイトル",
+             content: content,
+             username : username,
+             picture : picture,
+             date: new Date().getTime()
+           }, function (e) {});
+         }
+         $("#content").val("");
+       }
 
-        $('#post').click(function () {
-            post();
-        })
-        $('#content').keydown(function (e) {
-            if (e.which == 13){
-                post();
-                return false;
-            }
-        });
-    });
-    //インジェクション対策
-    function escapeHTML(val) {
-        return $('<div>').text(val).html();
-    };
+       $('#post').click(function () {
+         post();
+       })
+       $('#content').keydown(function (e) {
+         if (e.which == 13){
+           post();
+           return false;
+         }
+       });
+
+
+       var lock = new Auth0Lock(
+    	 'c5ZV6q8WdLQkjxRFNkUCgKeLfQqp6tXz',
+    	 'suzuki-shin.auth0.com'
+       );
+
+
+
+       $("#user").click(function() {
+	     milkcocoa.user(function(err, user) {
+           console.log('user');
+           console.log(user);
+	       if(user) {
+		     $("#output").html("ログイン済み" + JSON.stringify(user));
+           } else {
+		     $("#output").html("ログインしてください。");
+           }
+           
+	     });
+       });
+
+       $("#login").click(function() {
+         lock.showSignin(function(err, profile, token) {
+           if (err) {
+        	 return;
+           }
+           console.log(err, profile, token);
+
+           username = profile.screen_name || profile.name;
+           picture = profile.picture;
+
+           console.log('username');
+           console.log(username);
+
+           milkcocoa.authWithToken(token, function(err, user){console.log(user);});
+         });
+       });
+
+
+
+     });
+     //インジェクション対策
+     function escapeHTML(val) {
+       return $('<div>').text(val).html();
+     };
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="header">
-        <h1 class="logo">CHAT</h1>
+      <button class="login-button" id="login">ログイン</button>
+      <h1 class="logo">MOKUMOKU CHAT</h1>
     </div>
 
     <div class="container">
-        <div class="postarea cf">
+      <div class="postarea cf">
 
-            <div class="postarea-text">
-                <textarea name="" id="content" cols="30" rows="10" placeholder="Enterで投稿"></textarea>
-            </div>
-
-            <div class="postarea-share cf">
-                <p>このチャットをシェアする！</p>
-                <div class="postarea-share-button cf">
-                    <script>
-                    var url = encodeURIComponent(location.href);
-                    document.write('<iframe src="//www.facebook.com/plugins/like.php?href='+url+'&amp;width&amp;layout=button&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:20px;" allowTransparency="true"></iframe>');
-                    </script>
-                    <a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja" data-count="none">ツイート</a>
-                    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-                </div>
-            </div>
-
-
-            <button id="post" class="postarea-button">投稿する</button>
+        <div class="postarea-text">
+          <textarea name="" id="content" cols="30" rows="10" placeholder="Enterで投稿"></textarea>
         </div>
+
+        <!-- <div class="postarea-share cf">
+        <p>このチャットをシェアする！</p>
+        <div class="postarea-share-button cf">
+        <script>
+        var url = encodeURIComponent(location.href);
+        document.write('<iframe src="//www.facebook.com/plugins/like.php?href='+url+'&amp;width&amp;layout=button&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:20px;" allowTransparency="true"></iframe>');
+        </script>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja" data-count="none">ツイート</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+        </div>
+        </div> -->
+
+
+        <button id="post" class="postarea-button">投稿する</button>
+      </div>
     </div>
 
     <div id="messages" class="content">
-        <div id="dummy"></div>
+      <div id="dummy"></div>
     </div>
 
-    <p class="footer"><strong>Powered by <a href="http://mlkcca.com/">Milkcocoa</a></strong></p>
-</body>
+    <p class="footer"><strong>Powered by <a href="https://mlkcca.com/">Milkcocoa</a></strong></p>
+  </body>
 </html>
