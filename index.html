@@ -32,6 +32,14 @@
          renderMessage(e.value);
        });
 
+       console.log('USER');
+	   milkcocoa.user(function(err, user) {
+         console.log('mlkcca.user');
+         console.log(user);
+         console.log('err');
+         console.log(err);
+	   });
+
        var last_message = "dummy";
        var username;
        var picture;
@@ -91,11 +99,11 @@
 	     milkcocoa.user(function(err, user) {
            console.log('user');
            console.log(user);
-	       if(user) {
-		     $("#output").html("ログイン済み" + JSON.stringify(user));
-           } else {
-		     $("#output").html("ログインしてください。");
-           }
+           /* if(user) { */
+             /* $("#output").html("ログイン済み" + JSON.stringify(user)); */
+           /* } else { */
+             /* $("#output").html("ログインしてください。"); */
+           /* } */
            
 	     });
        });
@@ -117,8 +125,6 @@
          });
        });
 
-
-
      });
      //インジェクション対策
      function escapeHTML(val) {
@@ -129,6 +135,7 @@
 
   <body>
     <div class="header">
+      <button class="login-button" id="user">user</button>
       <button class="login-button" id="login">ログイン</button>
       <h1 class="logo">MOKUMOKU CHAT</h1>
     </div>
