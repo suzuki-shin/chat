@@ -149,6 +149,7 @@ textarea {
   width:8.8em;
 }
 .header .login-button {
+  display: none;
   cursor:pointer;
   line-height:3.85em;
   border-radius:3px;
@@ -156,6 +157,22 @@ textarea {
   border:1px solid #EDEDED;
   text-decoration:none;
   float:right;
+}
+
+.header .logout-button {
+  display: none;
+  cursor:pointer;
+  line-height:3.85em;
+  border-radius:3px;
+  text-align:center;
+  border:1px solid #EDEDED;
+  text-decoration:none;
+  float:right;
+}
+
+.header .logout-button img{
+  height: 40px;
+  width: 40px;
 }
 
 .content {

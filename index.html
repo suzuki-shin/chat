@@ -38,6 +38,14 @@
          console.log(user);
          console.log('err');
          console.log(err);
+		 if (!err && user) {
+ 		   var profile = JSON.parse(localStorage.getItem('profile'));
+		   console.log(profile);
+		   $('#logout img').attr('src', profile.picture);;
+		   console.log('toggle');
+		   $('#login').hide();
+		   $('#logout').show();
+		 }
 	   });
 
        var last_message = "dummy";
@@ -67,13 +75,14 @@
          var content = escapeHTML($("#content").val());
  		 var profile = JSON.parse(localStorage.getItem('profile'));
          if (content && content !== "") {
-           ds.push({
+		   var data = {
              title: "タイトル",
              content: content,
              username : profile.screen_name || profile.name,
              picture : profile.picture,
              date: new Date().getTime()
-           }, function (e) {});
+           };
+           ds.push(data, function (e) {});
          }
          $("#content").val("");
        }
@@ -88,32 +97,23 @@
          }
        });
 
-
        var lock = new Auth0Lock(
     	 'c5ZV6q8WdLQkjxRFNkUCgKeLfQqp6tXz',
     	 'suzuki-shin.auth0.com'
        );
 
-
-
-       $("#user").click(function() {
-	     milkcocoa.user(function(err, user) {
-           console.log('user');
-           console.log(user);
-           console.log('err');
-           console.log(err);
-           /* if(user) { */
-             /* $("#output").html("ログイン済み" + JSON.stringify(user)); */
-           /* } else { */
-             /* $("#output").html("ログインしてください。"); */
-           /* } */
-           
-	     });
+	   /* $("#user").click(function() {
+		 milkcocoa.user(function(err, user) {
+		   console.log('user');
+		   console.log(user);
+		   console.log('err');
+		   console.log(err);
+		 });
        });
+	   */
 
        $("#login").click(function() {
          lock.show(function(err, profile, token) {
-           /* lock.showSignin(function(err, profile, token) { */
            if (err) {
 			 console.log('lock show err');
 			 console.log(err, profile, token);
@@ -121,9 +121,23 @@
            }
            console.log(err, profile, token);
 
+		   $('#logout img').attr('src', profile.picture);;
+		   $('#login').hide();
+		   $('#logout').show();
+
 		   localStorage.setItem('profile', JSON.stringify(profile));
            milkcocoa.authWithToken(token, function(err, user){console.log(user);});
          });
+       });
+
+       $("#logout").click(function() {
+		 if (confirm('ログアウトしますか？')) {
+		   localStorage.removeItem('token');
+		   localStorage.removeItem('profile');
+		   milkcocoa.logout();
+		   $('#logout').hide();
+		   $('#login').show();
+		 }
        });
 
      });
@@ -136,8 +150,8 @@
 
   <body>
     <div class="header">
-      <button class="login-button" id="user">user</button>
       <button class="login-button" id="login">ログイン</button>
+      <button alt="ログアウト" class="logout-button" id="logout"><img /></button>
       <h1 class="logo">MOKUMOKU CHAT</h1>
     </div>
 
