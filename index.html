@@ -65,12 +65,13 @@
        function post() {
          //5."message"データストアにメッセージをプッシュする
          var content = escapeHTML($("#content").val());
+ 		 var profile = JSON.parse(localStorage.getItem('profile'));
          if (content && content !== "") {
            ds.push({
              title: "タイトル",
              content: content,
-             username : username,
-             picture : picture,
+             username : profile.screen_name || profile.name,
+             picture : profile.picture,
              date: new Date().getTime()
            }, function (e) {});
          }
@@ -99,6 +100,8 @@
 	     milkcocoa.user(function(err, user) {
            console.log('user');
            console.log(user);
+           console.log('err');
+           console.log(err);
            /* if(user) { */
              /* $("#output").html("ログイン済み" + JSON.stringify(user)); */
            /* } else { */
@@ -109,18 +112,16 @@
        });
 
        $("#login").click(function() {
-         lock.showSignin(function(err, profile, token) {
+         lock.show(function(err, profile, token) {
+           /* lock.showSignin(function(err, profile, token) { */
            if (err) {
+			 console.log('lock show err');
+			 console.log(err, profile, token);
         	 return;
            }
            console.log(err, profile, token);
 
-           username = profile.screen_name || profile.name;
-           picture = profile.picture;
-
-           console.log('username');
-           console.log(username);
-
+		   localStorage.setItem('profile', JSON.stringify(profile));
            milkcocoa.authWithToken(token, function(err, user){console.log(user);});
          });
        });
