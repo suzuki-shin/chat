@@ -151,7 +151,7 @@ textarea {
 .header .login-button {
   display: none;
   cursor:pointer;
-  line-height:3.85em;
+/*   line-height:3.85em; */
   border-radius:3px;
   text-align:center;
   border:1px solid #EDEDED;
@@ -162,7 +162,7 @@ textarea {
 .header .logout-button {
   display: none;
   cursor:pointer;
-  line-height:3.85em;
+/*   line-height:3.85em; */
   border-radius:3px;
   text-align:center;
   border:1px solid #EDEDED;
@@ -224,4 +224,8 @@ textarea {
 
 .container .postarea .postarea-share .postarea-share-button a:hover,.container .postarea .postarea-button:hover {
   background:#E6E6E6;
+}
+
+.postarea {
+  display:none;
 }

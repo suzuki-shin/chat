@@ -32,12 +32,8 @@
          renderMessage(e.value);
        });
 
-       console.log('USER');
 	   milkcocoa.user(function(err, user) {
-         console.log('mlkcca.user');
-         console.log(user);
-         console.log('err');
-         console.log(err);
+console.log('milkcocoa.user');
 		 if (!err && user) {
  		   var profile = JSON.parse(localStorage.getItem('profile'));
 		   console.log(profile);
@@ -45,6 +41,11 @@
 		   console.log('toggle');
 		   $('#login').hide();
 		   $('#logout').show();
+		   $('.postarea').show();
+		 } else {
+		   $('#login').show();
+		   $('#logout').hide();
+		   $('.postarea').hide();
 		 }
 	   });
 
@@ -82,7 +83,7 @@
              picture : profile.picture,
              date: new Date().getTime()
            };
-           ds.push(data, function (e) {});
+           ds.push(data, function (e) {console.log(e);});
          }
          $("#content").val("");
        }
@@ -102,16 +103,6 @@
     	 'suzuki-shin.auth0.com'
        );
 
-	   /* $("#user").click(function() {
-		 milkcocoa.user(function(err, user) {
-		   console.log('user');
-		   console.log(user);
-		   console.log('err');
-		   console.log(err);
-		 });
-       });
-	   */
-
        $("#login").click(function() {
          lock.show(function(err, profile, token) {
            if (err) {
@@ -124,6 +115,7 @@
 		   $('#logout img').attr('src', profile.picture);;
 		   $('#login').hide();
 		   $('#logout').show();
+		   $('.postarea').show();
 
 		   localStorage.setItem('profile', JSON.stringify(profile));
            milkcocoa.authWithToken(token, function(err, user){console.log(user);});
@@ -137,6 +129,7 @@
 		   milkcocoa.logout();
 		   $('#logout').hide();
 		   $('#login').show();
+		   $('.postarea').hide();
 		 }
        });
 
@@ -161,19 +154,6 @@
         <div class="postarea-text">
           <textarea name="" id="content" cols="30" rows="10" placeholder="Enterで投稿"></textarea>
         </div>
-
-        <!-- <div class="postarea-share cf">
-        <p>このチャットをシェアする！</p>
-        <div class="postarea-share-button cf">
-        <script>
-        var url = encodeURIComponent(location.href);
-        document.write('<iframe src="//www.facebook.com/plugins/like.php?href='+url+'&amp;width&amp;layout=button&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:20px;" allowTransparency="true"></iframe>');
-        </script>
-        <a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja" data-count="none">ツイート</a>
-        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-        </div>
-        </div> -->
-
 
         <button id="post" class="postarea-button">投稿する</button>
       </div>
