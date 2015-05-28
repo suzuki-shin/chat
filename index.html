@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta property="og:title" content="もくもくチャット " />
     <meta property="og:type" content="chat" />
     <meta property="og:description" content="BaaS（Milkcocoa）で作られたリアルタイムチャット" />
@@ -11,9 +11,29 @@
     <link rel="stylesheet" href="style.css" type="text/css" />
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.mlkcca.com/v2.0.0/milkcocoa.js"></script>
-    <script src="https://cdn.auth0.com/js/lock-6.js"></script>
+	<script src="//cdn.auth0.com/js/lock-7.1.min.js"></script>
     <script>
+	 var user = null;
+	 function isLoggedIn() {
+	   console.log('user');
+ 	   user = JSON.parse(localStorage.getItem('profile'));
+	   if (user) {
+		 console.log(user);
+		 console.log(user);
+		 $('#logout img').attr('src', user.picture);;
+		 console.log('toggle');
+		 $('#login').hide();
+		 $('#logout').show();
+		 $('.postarea').show();
+		 return user;
+	   } else {
+		 $('#login').show();
+		 $('#logout').hide();
+		 $('.postarea').hide();
+	   }
+	 }
      $(function() {
+
        //1.ミルクココアインスタンスを作成
        var milkcocoa = new MilkCocoa("catia81t5a6.mlkcca.com");
 
@@ -32,22 +52,22 @@
          renderMessage(e.value);
        });
 
-	   milkcocoa.user(function(err, user) {
-console.log('milkcocoa.user');
-		 if (!err && user) {
- 		   var profile = JSON.parse(localStorage.getItem('profile'));
-		   console.log(profile);
-		   $('#logout img').attr('src', profile.picture);;
-		   console.log('toggle');
-		   $('#login').hide();
-		   $('#logout').show();
-		   $('.postarea').show();
-		 } else {
-		   $('#login').show();
-		   $('#logout').hide();
-		   $('.postarea').hide();
-		 }
-	   });
+	   user = isLoggedIn();
+	   /* milkcocoa.user(function(err, user) {
+	   if (!err && user) {
+ 	   var profile = JSON.parse(localStorage.getItem('profile'));
+	   console.log(profile);
+	   $('#logout img').attr('src', profile.picture);;
+	   console.log('toggle');
+	   $('#login').hide();
+	   $('#logout').show();
+	   $('.postarea').show();
+	   } else {
+	   $('#login').show();
+	   $('#logout').hide();
+	   $('.postarea').hide();
+	   }
+	   }); */
 
        var last_message = "dummy";
        var username;
@@ -74,16 +94,18 @@ console.log('milkcocoa.user');
        function post() {
          //5."message"データストアにメッセージをプッシュする
          var content = escapeHTML($("#content").val());
- 		 var profile = JSON.parse(localStorage.getItem('profile'));
+		 /* var profile = JSON.parse(localStorage.getItem('profile')); */
          if (content && content !== "") {
+		   var username = user.name;
+		   /* var username = (profile.screen_name && profile.screen_name !== "") ? profile.screen_name : profile.name; */
 		   var data = {
              title: "タイトル",
              content: content,
-             username : profile.screen_name || profile.name,
-             picture : profile.picture,
+             username : username,
+             picture : user.picture,
              date: new Date().getTime()
            };
-           ds.push(data, function (e) {console.log(e);});
+           ds.push(data);
          }
          $("#content").val("");
        }
@@ -98,19 +120,20 @@ console.log('milkcocoa.user');
          }
        });
 
-       var lock = new Auth0Lock(
-    	 'c5ZV6q8WdLQkjxRFNkUCgKeLfQqp6tXz',
-    	 'suzuki-shin.auth0.com'
-       );
+	   var lock = new Auth0Lock(
+		 'c5ZV6q8WdLQkjxRFNkUCgKeLfQqp6tXz',
+		 'suzuki-shin.auth0.com'
+	   );
 
-       $("#login").click(function() {
+       $("#login").click(function(e) {
+		 /* e.preventDefault(); */
          lock.show(function(err, profile, token) {
            if (err) {
 			 console.log('lock show err');
 			 console.log(err, profile, token);
         	 return;
            }
-           console.log(err, profile, token);
+ console.log(err, profile, token);
 
 		   $('#logout img').attr('src', profile.picture);;
 		   $('#login').hide();
@@ -118,7 +141,7 @@ console.log('milkcocoa.user');
 		   $('.postarea').show();
 
 		   localStorage.setItem('profile', JSON.stringify(profile));
-           milkcocoa.authWithToken(token, function(err, user){console.log(user);});
+		   user = isLoggedIn();
          });
        });
 
@@ -126,10 +149,11 @@ console.log('milkcocoa.user');
 		 if (confirm('ログアウトしますか？')) {
 		   localStorage.removeItem('token');
 		   localStorage.removeItem('profile');
-		   milkcocoa.logout();
+		   /* milkcocoa.logout(); */
 		   $('#logout').hide();
 		   $('#login').show();
 		   $('.postarea').hide();
+		   profile = null;
 		 }
        });
 
