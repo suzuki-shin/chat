@@ -14,14 +14,10 @@
 	<script src="//cdn.auth0.com/js/lock-7.1.min.js"></script>
     <script>
 	 var user = null;
-	 function isLoggedIn() {
-	   console.log('user');
+	 function userProfile() {
  	   user = JSON.parse(localStorage.getItem('profile'));
 	   if (user) {
-		 console.log(user);
-		 console.log(user);
 		 $('#logout img').attr('src', user.picture);;
-		 console.log('toggle');
 		 $('#login').hide();
 		 $('#logout').show();
 		 $('.postarea').show();
@@ -32,6 +28,7 @@
 		 $('.postarea').hide();
 	   }
 	 }
+
      $(function() {
 
        //1.ミルクココアインスタンスを作成
@@ -53,7 +50,7 @@
          notifyMe(e.value);
        });
 
-	   user = isLoggedIn();
+	   user = userProfile();
 	   /* milkcocoa.user(function(err, user) {
 	   if (!err && user) {
  	   var profile = JSON.parse(localStorage.getItem('profile'));
@@ -160,7 +157,6 @@
 			 console.log(err, profile, token);
         	 return;
            }
- console.log(err, profile, token);
 
 		   $('#logout img').attr('src', profile.picture);;
 		   $('#login').hide();
@@ -168,7 +164,7 @@
 		   $('.postarea').show();
 
 		   localStorage.setItem('profile', JSON.stringify(profile));
-		   user = isLoggedIn();
+		   user = userProfile();
          });
        });
 
@@ -183,6 +179,8 @@
 		   profile = null;
 		 }
        });
+
+	   $('#content').focus();
 
      });
      //インジェクション対策
