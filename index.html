@@ -51,21 +51,6 @@
        });
 
 	   user = userProfile();
-	   /* milkcocoa.user(function(err, user) {
-	   if (!err && user) {
- 	   var profile = JSON.parse(localStorage.getItem('profile'));
-	   console.log(profile);
-	   $('#logout img').attr('src', profile.picture);;
-	   console.log('toggle');
-	   $('#login').hide();
-	   $('#logout').show();
-	   $('.postarea').show();
-	   } else {
-	   $('#login').show();
-	   $('#logout').hide();
-	   $('.postarea').hide();
-	   }
-	   }); */
 
        var last_message = "dummy";
        var username;
@@ -92,10 +77,10 @@
        function post() {
          //5."message"データストアにメッセージをプッシュする
          var content = escapeHTML($("#content").val());
-		 /* var profile = JSON.parse(localStorage.getItem('profile')); */
          if (content && content !== "") {
-		   var username = user.name;
-		   /* var username = (profile.screen_name && profile.screen_name !== "") ? profile.screen_name : profile.name; */
+		   var username = (user.screen_name && user.screen_name !== "") ? user.screen_name
+					    : (user.nickname && user.nickname !== "")       ? user.nickname
+    				    : user.name;
 		   var data = {
              title: "タイトル",
              content: content,
@@ -110,18 +95,27 @@
 
 	   function notifyMe(message) {
 		 if (document.hasFocus()) return;
-		 var state = message.content + " @" + message.username;
 		 var notification;
 
 		 // Let's check whether notification permissions have alredy been granted
 		 if (Notification.permission === "granted") {
 		   // If it's okay let's create a notification
-		   notification = new Notification(state);
+		   notification = new Notification('@' + message.username, {
+			 body: message.content, 
+			 icon: message.picture,
+			 iconUrl: message.picture,
+			 tag: 'mokumokuchat-' + message.username
+		   });
 		 } else if (Notification.permission !== 'denied') {
 		   Notification.requestPermission(function (permission) {
 			 // If the user accepts, let's create a notification
 			 if (permission === "granted") {
-			   notification = new Notification(state);
+			   notification = new Notification('@' + message.username, {
+				 body: message.content, 
+				 icon: message.picture,
+				 iconUrl: message.picture,
+				 tag: 'mokumokuchat-' + message.username
+			   });
 			 }
 		   });
 		 }
