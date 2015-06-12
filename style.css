@@ -48,6 +48,7 @@ textarea {
   *zoom:1;
 }
 .header {
+/*   background-color:#000099; */
   background-color:#1ba39c;
   width:100%;
   padding:.75em 0;
@@ -68,6 +69,7 @@ textarea {
 
 .container {
   width:100%;
+/*   background-color:#ffcc00; */
   background-color:#45bfb6;
 }
 
@@ -148,6 +150,7 @@ textarea {
   float:right;
   width:8.8em;
 }
+
 .header .login-button {
   display: none;
   cursor:pointer;
@@ -163,9 +166,9 @@ textarea {
   display: none;
   cursor:pointer;
 /*   line-height:3.85em; */
-  border-radius:3px;
-  text-align:center;
-  border:1px solid #EDEDED;
+/*   border-radius:3px; */
+/*   text-align:center; */
+  border:0px;
   text-decoration:none;
   float:right;
 }
